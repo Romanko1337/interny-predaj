@@ -115,7 +115,6 @@
           placeholder="****"
           minlength="4"
           maxlength="4"
-          pattern="[0-9]*"
           v-model="loginForm.password"
           v-bind:class="{ 'valid:border-green-400': passwordValid }"
           class="
