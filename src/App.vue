@@ -21,10 +21,11 @@
       </p>
     </Transition>
   </button>
-  <div class="w-full md:w-96 md:mx-auto md:my-5 p-0">
+
+  <div class="w-full md:w-96 md:mx-auto md:my-5 p-0 pt-0">
     <!-- Formulár -->
     <form
-      @submit.prevent="getLogin"
+      @submit.prevent=""
       id="form"
       class="
         bg-white
@@ -39,7 +40,13 @@
     >
       <!-- LOGO -->
       <img
-        class="p-5 mb-8 mx-auto w-50 dark:bg-slate-200 dark:rounded-3xl"
+        class="
+          p-5
+          mb-8
+          mx-auto
+          w-50
+          dark:bg-slate-200 dark:rounded-3xl dark:shadow-lg
+        "
         src="/images/logo.svg"
         alt="eTabletka"
       />
@@ -48,11 +55,10 @@
       <div class="mb-4">
         <label
           class="
-            text-etabletka-blue text-gray-700
+            text-gray-700
             dark:text-white
             text-left
             block
-            text-sm
             font-bold
             mb-2
             text-lg
@@ -62,6 +68,7 @@
           Číslo objednávky
         </label>
         <input
+          required
           name="text"
           type="text"
           pattern="[0-9]*"
@@ -69,13 +76,12 @@
           v-model="loginForm.text"
           v-bind:class="{ 'valid:border-green-400': textValid }"
           id="order-id"
-          required
           minlength="5"
           class="
             valid:border-green-400
             placeholder:dark:text-white
             dark:text-white dark:bg-slate-500
-            text-etabletka-blue text-gray-700
+            text-gray-700
             shadow-lg
             appearance-none
             border
@@ -94,17 +100,16 @@
       <!-- Pin kód -->
       <div class="mb-6">
         <label
+          for="password"
           class="
             dark:text-white
-            text-etabletka-blue text-gray-700 text-left
+            text-gray-700 text-left
             block
-            text-sm
             font-bold
             mb-2
             text-lg
             required
           "
-          for="password"
         >
           Pin kód
         </label>
@@ -119,7 +124,6 @@
           v-bind:class="{ 'valid:border-green-400': passwordValid }"
           class="
             valid:border-green-400
-            required
             placeholder:dark:text-white
             text-gray-700
             dark:text-white dark:bg-slate-500
@@ -137,26 +141,31 @@
         />
       </div>
 
-      <!-- Button -->
+      <!-- Button submit -->
       <div class="items-center justify-between m-auto" id="div-submit">
         <button
           @click="sendDataToServer"
           type="submit"
           v-bind:disabled="!passwordValid || !textValid"
           v-bind:class="{
-            'valid:border-green-400': passwordValid, textValid,
+            'valid:border-green-400': passwordValid,
+            textValid,
           }"
           id="submit"
           class="
             disabled:bg-slate-400
+            disabled:hover:bg-slate-500
             disabled:hover:border-slate-400
             disabled:dark:bg-slate-400
             disabled:dark:hover:border-slate-400
+            disabled:dark:hover:bg-slate-300
+            disabled:dark:border-slate-400
             bg-green-500
             hover:border-green-600 hover:bg-green-600
             dark:bg-green-600
             dark:hover:border-green-500
             dark:hover:bg-green-500
+            dark:border-green-600
             text-white
             font-bold
             mx-auto
@@ -170,10 +179,35 @@
         >
           Potvrdiť
         </button>
-
-        <!-- <Submit></Submit> -->
       </div>
     </form>
+    <transition-group name="fade" tag="div">
+      <div
+        v-for="(data, index) in loginFormList"
+        :key="index"
+        id="newDiv"
+        class="
+          flex-start
+          rounded
+          bg-white
+          text-lg
+          shadow-lg
+          py-2
+          my-2
+          text-gray-700
+          dark:text-white dark:bg-slate-500 dark:shadow-lg dark:shadow-black
+        "
+      >
+        <b>{{ data.text }}</b> -
+        {{
+          new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        }}
+      </div>
+    </transition-group>
+    <!-- <Submit></Submit> -->
   </div>
 </template>
 
@@ -195,50 +229,48 @@ export default {
   components: {
     Submit,
   },
+
   data() {
     return {
-      inputValue: "",
+      show: false,
       loginForm: {
         text: "",
         password: "",
       },
-      receivedData: null,
+      loginFormList: [],
     };
   },
 
   computed: {
     passwordValid() {
-      return (
-        this.loginForm.password.length >= 4 &&
-        this.loginForm.password.match(/^[0-9]+$/)
-      );
+      return this.loginForm.password.length >= 4;
     },
     textValid() {
       return (
-        this.loginForm.text.length >= 5 &&
-        this.loginForm.text.match(/^[0-9]+$/)
+        this.loginForm.text.length >= 5 && this.loginForm.text.match(/^[0-9]+$/)
       );
     },
   },
 
   methods: {
-    getLogin() {
-      console.log("Posielam do konzole", this.loginForm);
-    },
     async sendDataToServer() {
       try {
-        const response = await axios.post("rado-servisa", {
-          data: "your-data",
-        });
-        this.receivedData = response.data;
-        if (this.receivedData === true) {
-          alert("Prijaté");
+        const response = await axios.post("/server/url", this.loginForm);
+        if (response.data === true) {
+          this.addNewDiv();
         }
       } catch (error) {
         console.error(error);
       }
     },
+    addNewDiv() {
+      this.loginFormList.unshift({ text: this.loginForm.text });
+      setTimeout(() => {
+        this.loginFormList.shift();
+      }, 3000);
+      const audio = new Audio('/sound.mp3')
+      audio.play()
+    },
   },
 };
 </script>
-

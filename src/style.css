@@ -38,7 +38,7 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: 100vh;
+  height: auto;
 }
 
 h1 {
@@ -72,7 +72,7 @@ button:focus-visible {
 #app {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 3px;
   text-align: center;
 }
 
@@ -87,4 +87,31 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+/* For Webkit-based browsers (Chrome, Safari and Opera) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* For IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+.new-div {
+  background-color: #ddd;
+  padding: 20px;
+  margin-bottom: 10px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 2s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }

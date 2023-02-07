@@ -1,26 +1,10 @@
-// Nepoužívam
-
 <template>
   <div>
-    <button
-      class="
-        bg-green-500
-        hover:border-green-600 hover:bg-green-600
-        dark:bg-green-600 dark:hover:border-green-500 dark:hover:bg-green-500
-        text-white
-        font-bold
-        mx-auto
-        py-2
-        px-4
-        rounded
-        focus:outline-none focus:shadow-outline
-        shadow-lg
-        btn
-      "
-      @click="sendDataToServer"
-    >
-      Potvrdiť
-    </button>
+    <form @submit.prevent="sendDataToServer">
+      <!-- form inputs here -->
+      <button type="submit">Odoslať</button>
+    </form>
+    <div v-if="showSuccess">Úspešne odoslané</div>
   </div>
 </template>
 
@@ -30,25 +14,29 @@ import axios from "axios";
 export default {
   data() {
     return {
-      receivedData: null,
-    };
+      formData: {},
+      showSuccess: false
+    }
   },
-
   methods: {
     async sendDataToServer() {
       try {
-        const response = await axios.post("rado-servisa", {
-          data: "your-data",
-        });
-        this.receivedData = response.data;
-        if (this.receivedData === true) {
-          alert("Prijaté");
+        const response = await axios.post('/server/url', this.formData)
+        if (response.data === true) {
+          this.addNewDiv()
         }
       } catch (error) {
-        console.error(error);
+        console.error(error)
       }
     },
-  },
-};
+    addNewDiv() {
+      this.showSuccess = true
+      setTimeout(() => {
+        this.showSuccess = false
+      }, 3000)
+      const audio = new Audio('/path/to/sound.mp3')
+      audio.play()
+    }
+  }
+}
 </script>
-
