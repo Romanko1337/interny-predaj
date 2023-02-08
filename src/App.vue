@@ -144,7 +144,7 @@
       <!-- Button submit -->
       <div class="items-center justify-between m-auto" id="div-submit">
         <button
-          @click="sendDataToServer"
+          @click="addNewDiv"
           type="submit"
           v-bind:disabled="!passwordValid || !textValid"
           v-bind:class="{
@@ -160,13 +160,14 @@
             disabled:dark:hover:border-slate-400
             disabled:dark:hover:bg-slate-300
             disabled:dark:border-slate-400
+            text-white
             bg-green-500
+            enabled:border-green-500 enabled:hover:border-green-600
             hover:border-green-600 hover:bg-green-600
             dark:bg-green-600
             dark:hover:border-green-500
             dark:hover:bg-green-500
             dark:border-green-600
-            text-white
             font-bold
             mx-auto
             py-2
@@ -192,10 +193,12 @@
           bg-white
           text-lg
           shadow-lg
+          dark:shadow-lg
           py-2
           my-2
           text-gray-700
-          dark:text-white dark:bg-slate-500 dark:shadow-lg dark:shadow-black
+          dark:text-white dark:bg-slate-500 dark:shadow-black
+          border-2 border-green-500
         "
       >
         <b>{{ data.text }}</b> -
@@ -253,23 +256,37 @@ export default {
   },
 
   methods: {
+    // ak chceš otestovať funkčnosť funkcií bez servera - prepíš sendDataToServer v buttone na addNewDiv
     async sendDataToServer() {
       try {
         const response = await axios.post("/server/url", this.loginForm);
         if (response.data === true) {
           this.addNewDiv();
+          setTimeout(() => {
+            this.loginForm.text = "";
+            this.loginForm.password = "";
+          }, 400);
         }
       } catch (error) {
         console.error(error);
       }
     },
     addNewDiv() {
-      this.loginFormList.unshift({ text: this.loginForm.text });
+      setTimeout(() => {
+        this.loginFormList.unshift({ text: this.loginForm.text });
+      }, 400);
+
       setTimeout(() => {
         this.loginFormList.shift();
       }, 3000);
-      const audio = new Audio('/sound.mp3')
-      audio.play()
+
+      const audio = new Audio("/images/sound.mp3");
+      audio.play();
+      // vymaž text/password ak to už pôjde do produkcie, formulár sa musí vymazať až po odpovedi zo servera
+      setTimeout(() => {
+        this.loginForm.text = "";
+        this.loginForm.password = "";
+      }, 400);
     },
   },
 };
